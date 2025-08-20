@@ -11,7 +11,8 @@ const firebaseConfig = {
   measurementId: "G-J6TSDWF1X4"
 };
 // VAPID key for FCM web push (Cloud Messaging -> Web configuration)
-const FCM_VAPID_KEY = "REPLACE_ME";
+const FCM_VAPID_KEY = "BP-Aukq2L6wce2lY3aZipByAhAIjNCdM7Iw4RQXkPNue1Vg-_zKgeZ-IY7jyARtph5ds_1BMcRe6rjg4Yy_13RU
+";
 
 
 // DON'T change the variable names: app.js expects these to exist.
