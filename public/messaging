@@ -6,12 +6,12 @@ importScripts('https://www.gstatic.com/firebasejs/9.22.2/firebase-messaging-comp
 
 
 firebase.initializeApp({
-apiKey: "REPLACE_ME",
-authDomain: "REPLACE_ME",
-projectId: "REPLACE_ME",
-storageBucket: "REPLACE_ME",
-messagingSenderId: "REPLACE_ME",
-appId: "REPLACE_ME"
+apiKey: "AIzaSyDIxwpYXJ6t6PsS3XFUD9A7x62wE2tGnoA",
+  authDomain: "lab3-booking.firebaseapp.com",
+  projectId: "lab3-booking",
+  storageBucket: "lab3-booking.firebasestorage.app",
+  messagingSenderId: "791944587990",
+  appId: "1:791944587990:web:9c139bc0b5dfaa47493777",
 });
 
 
