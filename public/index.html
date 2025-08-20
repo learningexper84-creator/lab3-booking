@@ -1,0 +1,67 @@
+
+
+</head>
+<body>
+<div class="container">
+<header>
+<h1>Lab 3 Booking</h1>
+<p class="muted">Penang • Language Lab — Open 08:00–18:00</p>
+</header>
+
+
+<section class="card">
+<h2>New Booking</h2>
+<form id="bookingForm">
+<div class="row">
+<input id="name" placeholder="Your name" required>
+<input id="phone" placeholder="Phone number" required>
+</div>
+<div class="row">
+<input id="date" type="date" required>
+<select id="time"></select>
+<select id="duration"><option value="1">1 hour</option><option value="2">2 hours</option></select>
+</div>
+<div class="row actions">
+<button id="enableNotif" type="button">Enable Notifications</button>
+<button id="submitBtn" type="submit">Request Booking</button>
+</div>
+<div id="formMsg" class="muted small"></div>
+</form>
+</section>
+
+
+<section class="card">
+<h2>Schedule (<span id="showDate"></span>)</h2>
+<table id="schedule" class="schedule" aria-live="polite"></table>
+</section>
+
+
+<section class="card">
+<h2>Admin</h2>
+<div class="row">
+<input id="adminPass" placeholder="Admin passcode">
+<button id="adminBtn">Enter Admin Mode</button>
+</div>
+<div id="adminNotice" class="muted small">Admin logged out</div>
+</section>
+
+
+<footer class="muted small">Note: This demo stores data in Firestore. For production, tighten Firestore rules and replace passcode with Firebase Auth.</footer>
+</div>
+
+
+<!-- Firebase compat scripts (no build required) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-messaging-compat.js"></script>
+
+
+<!-- Your project config (fill values) -->
+<script src="firebase-config.js"></script>
+
+
+<!-- App logic -->
+<script src="app.js"></script>
+</body>
+</html>
+```
