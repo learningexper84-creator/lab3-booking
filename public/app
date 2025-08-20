@@ -1,0 +1,77 @@
+### public/app.js
+// Booking submit (no-overlap enforced client-side)
+async function handleBooking(e){
+e && e.preventDefault();
+setFormMessage('Validating…');
+const name = nameInput.value.trim();
+const phone = phoneInput.value.trim();
+const date = dateInput.value;
+const time = timeSelect.value;
+const duration = Number(durationSelect.value);
+if (!name || !phone) { setFormMessage('Enter name & phone', true); return; }
+// Validate date/time rules
+const startMinutes = hhmmToMinutes(time);
+const endMinutes = startMinutes + duration*60;
+// at least 1 hour in advance
+const now = new Date();
+const startDateTime = new Date(`${date}T${time}:00`);
+if (startDateTime.getTime() - now.getTime() < 60*60*1000){ setFormMessage('Booking must be made at least 1 hour before start', true); return; }
+// max 1 day ahead
+const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1); tomorrow.setHours(23,59,59,999);
+if (startDateTime > tomorrow){ setFormMessage('Booking can be made only for today or tomorrow', true); return; }
+
+
+// Check existing bookings for the date
+try{
+const q = await db.collection('lab3_bookings').where('date','==',date).get();
+const docs = q.docs.map(d=>({ id:d.id, ...d.data() }));
+const conflict = docs.find(b=>{
+if (b.status === 'cancelled') return false;
+const bStart = hhmmToMinutes(b.time);
+const bEnd = bStart + (b.duration||1)*60;
+return (startMinutes < bEnd && bStart < endMinutes);
+});
+if (conflict){ setFormMessage('This slot is already reserved (choose another time)', true); return; }
+
+
+// get fcm token if possible
+let token = null;
+try{ token = await messaging.getToken({ vapidKey: FCM_VAPID_KEY }); }catch(err){ console.log('token error', err); }
+
+
+await db.collection('lab3_bookings').add({
+name, phone, date, time, duration, status: 'pending', fcmToken: token || null, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+});
+setFormMessage('Booking request submitted. Await admin approval.');
+nameInput.value=''; phoneInput.value='';
+}catch(err){ console.error(err); setFormMessage('Failed to submit booking', true); }
+}
+
+
+submitBtn.addEventListener('click', handleBooking);
+
+
+// Admin actions
+async function approveBooking(id){
+try{ await db.collection('lab3_bookings').doc(id).update({ status: 'approved' }); setFormMessage('Booking approved'); }
+catch(e){ console.error(e); setFormMessage('Approve failed', true); }
+}
+async function rejectBooking(id){
+try{ await db.collection('lab3_bookings').doc(id).update({ status: 'cancelled' }); setFormMessage('Booking cancelled'); }
+catch(e){ console.error(e); setFormMessage('Reject failed', true); }
+}
+
+
+adminBtn.addEventListener('click', ()=>{
+if (!isAdmin){ if (adminPass.value === ADMIN_PASSCODE){ isAdmin = true; adminNotice.textContent='Admin mode ON'; adminBtn.textContent='Exit Admin Mode'; subscribeSchedule(dateInput.value); } else { alert('Invalid passcode'); } }
+else { isAdmin=false; adminNotice.textContent='Admin logged out'; adminBtn.textContent='Enter Admin Mode'; subscribeSchedule(dateInput.value); }
+});
+
+
+// Change date -> update live snapshot
+dateInput.addEventListener('change', ()=>{ const d = dateInput.value; if (d !== currentDate) subscribeSchedule(d); });
+
+
+// initial snapshot
+subscribeSchedule(currentDate);
+```
