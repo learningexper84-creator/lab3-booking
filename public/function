@@ -1,0 +1,41 @@
+### functions/index.js
+```js
+const functions = require('firebase-functions');
+const admin = require('firebase-admin');
+admin.initializeApp();
+
+
+exports.onBookingStatusChange = functions.firestore
+.document('lab3_bookings/{bookingId}')
+.onUpdate(async (change, context) => {
+const before = change.before.data() || {};
+const after = change.after.data() || {};
+if (!before || !after) return null;
+if (before.status === after.status) return null;
+
+
+const token = after.fcmToken;
+if (!token) return null; // no device to notify
+
+
+const status = after.status;
+const title = status === 'approved' ? 'Lab 3 booking approved' : (status === 'cancelled' ? 'Lab 3 booking cancelled' : 'Booking updated');
+const body = `${after.date} • ${after.time} • ${after.duration}h`;
+
+
+const message = {
+token: token,
+notification: { title, body },
+data: { status: String(status || '') }
+};
+
+
+try{
+await admin.messaging().send(message);
+console.log('Notification sent');
+}catch(err){
+console.error('FCM send error', err);
+}
+return null;
+});
+```
